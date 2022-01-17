@@ -28,10 +28,8 @@ export default {
   created() {
     console.log("Abdi's completion task includes but not limited to ....");
     console.log("Activating my email Sender");
-    console.log("notification count ui modification");
     console.log("Positioning my notifier to the center of every notifying page,");
     console.log("setting auto scroller effects for my chats and comments");
-   console.log("get usrs by cookies");
   },
    mounted() {
     connection.client.on("NewChat",function (chat) {
