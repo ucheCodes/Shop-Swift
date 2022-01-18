@@ -88,7 +88,7 @@
 
 <script>
 import {mapState, mapActions, mapMutations} from 'vuex'
-import moment from 'moment'
+import moment from 'moment'      // "fortawesome": "0.0.1-security",
 ///// for later use |||||| back slash \\\\
 export default {
   name: 'Main',
