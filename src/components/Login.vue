@@ -177,21 +177,21 @@ export default {
           response => {
             if (response.data.length > 0) {
               var user = JSON.parse(response.data[0].value);
-              var link  = `<p>click here to go back to <a>https://amazing.io</a></p>`;
-              var domain = `<a>https://amazing.io</a>`;
+              var link  = `<p>click here to go back to <a>https://shop-swiftly.vercel.app/#/</a></p>`;
+              var domain = `<a>https://shop-swiftly.vercel.app/#/</a>`;
               if (user) {
                 var emailData = {
-                  fromAddress : "amazingdigitalworld@hotmail.com",
+                  fromAddress : "amazincoders0@gmail.com",
                   toAddress : user.Email,
-                  title : "Password Retrieval From Shop Swift E-Commerce Platform",
-                  fromAddressPassword : "VictorKenAmzing123$",
+                  title : "Password Retrieval System From Shop Swift E-Commerce Platform",
+                  fromAddressPassword : "AmazingCoders1$",
                   password : Decryption(user.Password1),
                   message : `<p> Hello `+user.Lastname+` `+user.Firstname+` your password retrieved from  `+domain+` is `+Decryption(user.Password1)+` kindly login to the platform with the retrieved password \n"</p>`+link,
                   link : link
                 }
-                console.log("on your consent (Abdi), I will uncomment the code that will send this emil to api backend");
-                console.log(emailData);
-                //this.sendEmail(emailData);
+                //console.log("on your consent (Abdi), I will uncomment the code that will send this emil to api backend");
+                //console.log(emailData);
+                this.sendEmail(emailData);
               }
             }
             else{alert("notify js data not found.")}

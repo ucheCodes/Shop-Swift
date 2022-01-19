@@ -14,9 +14,9 @@
                       </select>
                     </div>
                     <button class="button"><router-link to="/market">Explore</router-link></button>
-                </div>
-                <div>
-                  <input @change="_changeCoverImage" type="file" id="coverImgInput">
+                  <div>
+                   <input @change="_changeCoverImage" type="file" id="coverImgInput">
+                  </div>
                 </div>
                 <div v-if="user.IsSuperAdmin">
                   <div  v-if="coverImg" class="col-2 back-img">

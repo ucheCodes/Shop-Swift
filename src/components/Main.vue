@@ -90,6 +90,10 @@
 import {mapState, mapActions, mapMutations} from 'vuex'
 import moment from 'moment'      // "fortawesome": "0.0.1-security",
 ///// for later use |||||| back slash \\\\
+//git push coomands
+//git remote add origin https://github.com/ucheCodes/Shop-Swift.git
+//
+// git push -u origin main
 export default {
   name: 'Main',
   components: {

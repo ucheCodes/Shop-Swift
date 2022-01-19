@@ -980,7 +980,12 @@ export default createStore({
     sendEmail(context,payload){
       axios.post(context.state.apiUrl+"email",payload).then(
         response => {
-          console.log(response.data);
+          if(response.data == "success"){
+            alert(" Success ... A mail has been sent to you!")
+          }
+          else{
+            console.log(response.data);
+          }
         }
       )
     },
