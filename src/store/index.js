@@ -13,9 +13,9 @@ function updateLocalStorage(cart) {
 export default createStore({
   state: {
     cart : [],
-    serverPath: "https://localhost:5001/",//I have to change this 3 parts to the set domain of the azure
-    apiUrl : "https://localhost:5001/api/",//domain containing the api codes here.
-    photoUrl : "https://localhost:5001/photos/",//I can host this first using git then avail it for changes afterwards.
+    serverPath: "https://swift-server.azurewebsites.net/",
+    apiUrl : "https://swift-server.azurewebsites.net/api/",
+    photoUrl : "https://swift-server.azurewebsites.net/photos/",
     allUsers:[],
     allProducts:[],
     allBrands:[],
@@ -984,7 +984,7 @@ export default createStore({
             alert(" Success ... A mail has been sent to you!")
           }
           else{
-            console.log(response.data);
+            alert(response.data);
           }
         }
       )
