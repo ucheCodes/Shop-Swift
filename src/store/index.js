@@ -13,9 +13,9 @@ function updateLocalStorage(cart) {
 export default createStore({
   state: {
     cart : [],
-    serverPath: "https://swift-server.azurewebsites.net/",
-    apiUrl : "https://swift-server.azurewebsites.net/api/",
-    photoUrl : "https://swift-server.azurewebsites.net/photos/",
+    serverPath: "https://gitless.azurewebsites.net/",
+    apiUrl : "https://gitless.azurewebsites.net/",
+    photoUrl : "https://gitless.azurewebsites.net//photos/",
     allUsers:[],
     allProducts:[],
     allBrands:[],

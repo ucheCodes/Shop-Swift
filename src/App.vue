@@ -30,6 +30,12 @@ export default {
     // console.log("Activating my email Sender");
     // console.log("Positioning my notifier to the center of every notifying page,");
     // console.log("setting auto scroller effects for my chats and comments");
+    axios.get(this.apiUrl+"connection").then(
+      response => {
+        console.log("m,aking api calls ...");
+        console.log(response.data);
+      }
+    )
   },
    mounted() {
     connection.client.on("NewChat",function (chat) {
