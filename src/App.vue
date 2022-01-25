@@ -29,7 +29,7 @@ export default {
     // console.log("Activating my email Sender");
     // console.log("Positioning my notifier to the center of every notifying page,");
     // console.log("setting auto scroller effects for my chats and comments");
-    axios.get(this.apiUrl+"connection").then(
+    axios.get(this.apiUrl+"default").then(
       response => {
         console.log("making api calls ...");
         console.log(response.data);
