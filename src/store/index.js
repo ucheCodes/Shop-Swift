@@ -14,8 +14,8 @@ export default createStore({
   state: {
     cart : [],
     serverPath: "https://gitless.azurewebsites.net/",
-    apiUrl : "https://gitless.azurewebsites.net/",
-    photoUrl : "https://gitless.azurewebsites.net//photos/",
+    apiUrl : "https://gitless.azurewebsites.net/api/",
+    photoUrl : "https://gitless.azurewebsites.net/photos/",
     allUsers:[],
     allProducts:[],
     allBrands:[],

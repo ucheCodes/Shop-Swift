@@ -23,7 +23,6 @@ export default {
   },
   methods: {
       ...mapActions(["getEncryptionKey","getCoverImage","keyExists","changeDp","getUserByCookie","getAllUsers","getAllProducts","getAllBrands","getAds","getGroupChats"]),
-      // ...mapMutations([""]),
   },
   created() {
     // console.log("Abdi's completion task includes but not limited to ....");
@@ -32,7 +31,7 @@ export default {
     // console.log("setting auto scroller effects for my chats and comments");
     axios.get(this.apiUrl+"connection").then(
       response => {
-        console.log("m,aking api calls ...");
+        console.log("making api calls ...");
         console.log(response.data);
       }
     )
