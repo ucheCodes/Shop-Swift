@@ -73,11 +73,11 @@
         <div class="col-2" v-if="allAds.length">
             <div class="myslides fade"  v-for="(ad,count) in allAds" :key="ad.Id" :id="ad.File">
                 <div class="numbertext">{{count}}/{{allAds.length}}</div>
-                 <div v-if="ad.File.includes('.jpg') || ad.File.includes('.jpeg')">
+                 <div v-if="(ad.Filename && ad.Filename.includes('.jpg')) || (ad.Filename && ad.Filename.includes('.jpeg'))">
                     <img :src="photoUrl+ad.File" :alt="ad.Id"/>
                 </div>
-                <div v-else-if="ad.File.includes('.mp4') || ad.File.includes('.3gp')">
-                    <video controls :src="photoUrl+ad.File"></video>
+                <div v-else-if="(ad.Filename && ad.Filename.includes('.mp4')) || (ad.Filename && ad.Filename.includes('.3gp'))">
+                    <video controls :src="videoUrl+ad.File"></video>
                 </div>
             </div>
         </div>
@@ -104,22 +104,22 @@
                            <p>{{ad.Desc}}</p>
                        </div>
                    </div>
-                    <div class="big-image" v-if="ad.File.includes('.jpg') || ad.File.includes('.jpeg')">
+                    <div class="big-image" v-if=" ad.Filename && ad.Filename.includes('.jpg') || ad.Filename && ad.Filename.includes('.jpeg')">
                          <img :src="photoUrl+ad.File" :alt="ad.Id">
                     </div>
-                    <div v-else-if="ad.File.includes('.mp4') || ad.File.includes('.3gp')">
-                        <video controls :src="photoUrl+ad.File"></video>
+                    <div v-else-if="ad.Filename && ad.Filename.includes('.mp4') ||ad.Filename && ad.Filename.includes('.3gp')">
+                        <video controls :src="videoUrl+ad.File"></video>
                     </div>
                </div>
            </div>
             <div class="col-2" v-if="allAds.length">
                 <div class="myslides fade"  v-for="(ad,count) in allAds" :key="ad.Id" :id="ad.File">
                     <div class="numbertext">{{count}}/{{allAds.length}}</div>
-                    <div v-if="ad.File.includes('.jpg') || ad.File.includes('.jpeg')">
-                    <img :src="photoUrl+ad.File" :alt="ad.Id"/>
+                    <div v-if="ad.Filename && ad.Filename.includes('.jpg') || ad.Filename && ad.Filename.includes('.jpeg')">
+                       <img :src="photoUrl+ad.File" :alt="ad.Id"/>
                     </div>
-                    <div v-else-if="ad.File.includes('.mp4') || ad.File.includes('.3gp')">
-                        <video controls :src="photoUrl+ad.File"></video>
+                    <div v-else-if="ad.Filename && ad.Filename.includes('.mp4') || ad.Filename && ad.Filename.includes('.3gp')">
+                        <video controls :src="videoUrl+ad.File"></video>
                     </div>
                 </div>
             </div>
@@ -173,7 +173,7 @@ export default {
     //   }
     },
     computed:{
-        ...mapState(["allProducts","photoUrl","user","cart","allAds"])
+        ...mapState(["allProducts","photoUrl","videoUrl","user","cart","allAds"])
     },
 
     methods: { 

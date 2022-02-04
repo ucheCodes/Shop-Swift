@@ -8,8 +8,6 @@ class CallHub{
      start() {
         this.startedPromise = this.client.start().then(() => this.client.invoke("GetConnectionId").then(function (id) {
              store.commit("setSignalrId",id);
-             console.log("signal r server started running and id is below");
-             console.log("signal r id is "+id);
             }))
             .catch(
                 err => {

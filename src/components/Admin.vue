@@ -72,8 +72,8 @@
                             <td><input type="checkbox"  @change="changeSuperAdmin(user.UserId)"  v-model="user.IsSuperAdmin"></td>            
                             <td><input type="checkbox" v-model="user.IsAdmin"></td>            
                             <td><input type="checkbox"  @change="changeAffiliate(user.UserId)" v-model="user.IsAffiliate"></td>   
-                            <td v-if="user.ImagePath != null"><img :src="photoUrl+user.ImagePath" alt="img"></td>  
-                            <td v-else><img :src="photoUrl+'img.jpg'" alt="img"></td>  
+                            <td v-if="user.ImagePath != null"><img :src="photoUrl+user.ImagePath" alt="img"></td> 
+                            <td v-else-if="coverImg" ><img :src="photoUrl+coverImg" alt="chat-img"></td>  
                             <td  @click="_deleteUser(user.UserId)" class="delete"><span class="fas fa-trash"></span></td>      
                           </tr>
                       </tbody>
@@ -125,7 +125,7 @@
                             <td><input type="checkbox" v-model="user.IsAdmin"></td>            
                             <td><input type="checkbox"  @change="changeAffiliate(user.UserId)" v-model="user.IsAffiliate"></td>   
                             <td v-if="user.ImagePath != null"><img :src="photoUrl+user.ImagePath" alt="img"></td>  
-                            <td v-else><img :src="photoUrl+'img.jpg'" alt="img"></td>  
+                            <td v-else-if="coverImg"><img :src="photoUrl+coverImg" alt="chat-img"></td>  
                             <td  @click="_deleteUser(user.UserId)" class="delete"><span class="fas fa-trash"></span></td> 
                             <td @click="goToChat(user.UserId)"><span class="fas fa-comment"></span></td> 
                           </tr>
@@ -177,7 +177,10 @@
                     <div class="info flex-col">
                       <h4>{{notif.Lastname}} {{notif.Firstname}}</h4>
                       <div class="flex-row">
-                            <div v-if="notif.ImagePath"><img :src="photoUrl+notif.ImagePath" alt="customer"></div>
+                            <div>
+                              <div v-if="notif.ImagePath"><img :src="photoUrl+notif.ImagePath" alt="customer"></div>
+                              <div v-else-if="coverImg"><img :src="photoUrl+coverImg" alt="chat-img"></div>
+                            </div>
                             <small class="mobile" :class="{showMobile : showMobile}">Mobile: {{notif.Mobile}}</small>
                             <div class="contact">
                               <span v-if="notif.NotificationType == 'like'"  @click="viewLikes(notif.ProductId)" class="fas fa-eye"></span>
@@ -259,7 +262,7 @@ export default {
     }
   },
   computed:{
-    ...mapState(["allUsers","allProducts","allBrands","photoUrl","apiUrl","modifiedBrands","notifications","user","showNotifier"])
+    ...mapState(["allUsers","allProducts","allBrands","coverImg","photoUrl","apiUrl","modifiedBrands","notifications","user","showNotifier"])
   },
   methods: {
     ...mapActions(["getAllUsers","deleteUser","changeAffiliate","getNotifications","changeSuperAdmin"]),

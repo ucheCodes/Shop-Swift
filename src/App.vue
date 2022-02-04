@@ -25,16 +25,12 @@ export default {
       ...mapActions(["getEncryptionKey","getCoverImage","keyExists","changeDp","getUserByCookie","getAllUsers","getAllProducts","getAllBrands","getAds","getGroupChats"]),
   },
   created() {
-    // console.log("Abdi's completion task includes but not limited to ....");
-    // console.log("Activating my email Sender");
-    // console.log("Positioning my notifier to the center of every notifying page,");
-    // console.log("setting auto scroller effects for my chats and comments");
-    axios.get(this.apiUrl+"default").then(
-      response => {
-        console.log("making api calls ...");
-        console.log(response.data);
-      }
-    )
+    // axios.get(this.apiUrl+"default").then(
+    //   response => {
+    //     console.log("making api calls ...");
+    //     console.log(response.data);
+    //   }
+    // );
   },
    mounted() {
     connection.client.on("NewChat",function (chat) {
@@ -79,7 +75,7 @@ export default {
       store.commit("newNotification",notif);
     });
     connection.start();
-      this.getUserByCookie();
+
       this.getAllUsers();  
       this.getAllBrands();
       this.getAllProducts();
@@ -87,6 +83,7 @@ export default {
       this.getGroupChats();
       this.getEncryptionKey();
       this.getCoverImage();
+      this.getUserByCookie();
 
 
     setInterval(function() {

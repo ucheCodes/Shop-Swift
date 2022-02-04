@@ -15,7 +15,7 @@
                     </div>
                     <button class="button"><router-link to="/market">Explore</router-link></button>
                   <div>
-                   <input @change="_changeCoverImage" type="file" id="coverImgInput">
+                   <input @change="_changeCoverImage" accept=".jpg, .jpeg" type="file" id="coverImgInput">
                   </div>
                 </div>
                 <div v-if="user.IsSuperAdmin">

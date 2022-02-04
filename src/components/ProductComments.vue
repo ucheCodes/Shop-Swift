@@ -32,7 +32,8 @@
             <div class="col-2 comment-container" v-if="productComments && user.UserId">
                 <div class="comment flex-col" v-for="(comment,count) in productComments" :key="count">
                     <div class="user-comment flex-row">
-                        <img :src="photoUrl+comment.ImagePath" :alt="count" class="user-comment-img">
+                        <img v-if="comment.ImagePath" :src="photoUrl+comment.ImagePath" :alt="count" class="user-comment-img">
+                        <img class="user-comment-img" v-else-if="coverImg" :src="photoUrl+coverImg" alt="chat-img">
                         <div class="comment-text">
                             <div class="text">
                                 <div class="flex-row">
@@ -60,7 +61,8 @@
                                 <div v-if="commentResponses.size > 0 && commentResponses.has(comment.CommentId)">
                                     <div class="reply-list flex-col"  v-for="reply in commentResponses.get(comment.CommentId)" :key="reply">
                                         <div class="flex-row user-reply">
-                                            <img :src="photoUrl+reply.ImagePath" alt="" class="user-reply-img">
+                                            <img v-if="reply.ImagePath" :src="photoUrl+reply.ImagePath" alt="" class="user-reply-img">
+                                            <img class="user-reply-img" v-else-if="coverImg" :src="photoUrl+coverImg" alt="chat-img">
                                             <div class="reply-text">
                                                 <div class="flex-row">
                                                     <small for="">{{reply.Lastname}}</small><br>
@@ -125,7 +127,7 @@ export default {
         }
     },
     computed:{
-        ...mapState(["allProducts","allBrands","allUsers","photoUrl","apiUrl","user","productComments","commentResponses"]),
+        ...mapState(["allProducts","allBrands","allUsers","coverImg","photoUrl","apiUrl","user","productComments","commentResponses"]),
     },
     methods: {
         ...mapActions(["getProductComments","getCommentResponse","postNotification"]),

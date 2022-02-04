@@ -13,9 +13,13 @@ function updateLocalStorage(cart) {
 export default createStore({
   state: {
     cart : [],
+    // serverPath: "https:/localhost:5001/",
+    // apiUrl : "https://localhost:5001/api/",
+    photoUrl : "data:image/jpeg;base64,",
+    videoUrl : "data:video/mp4;base64,",
+    audioUrl : "data:audio/wav;base64,",
     serverPath: "https://gitless.azurewebsites.net/",
     apiUrl : "https://gitless.azurewebsites.net/api/",
-    photoUrl : "https://gitless.azurewebsites.net/photos/",
     allUsers:[],
     allProducts:[],
     allBrands:[],
@@ -29,7 +33,6 @@ export default createStore({
       Lastname : 'swift',
       IsAdmin : false,
       IsSuperAdmin : false,
-      ImagePath : "img.jpg",
     },
     signalrId : "",
     brand : null,
@@ -76,14 +79,15 @@ export default createStore({
       }
     },
     getUserByCookie(state,payload){
-      state.user = JSON.parse(payload.value);
+      if (payload.value) {
+        state.user = JSON.parse(payload.value);
+      }
     },
     getAllUsers(state,payload){
       payload.forEach(element => {
         var parsedValue = JSON.parse(element.value)
         state.allUsers.push(parsedValue);
       });
-     // console.log(state.allUsers);
     },
     getAndLogUser(state,payload){
       state.user = payload;
@@ -845,14 +849,16 @@ export default createStore({
               if (diff < 60 && context.state.user.UserId != userId) {              
                 if (context.state.allUsers.length) {
                     var  user = context.state.allUsers.find(u => u.UserId == userId);
+                   if(user){
                     var onlineUser = {
-                          Lastname : user.Lastname,
-                          Firstname : user.Firstname,
-                          ImagePath : user.ImagePath,
-                          UserId : user.UserId,
-                          SignalrId: signalrId
+                      Lastname : user.Lastname,
+                      Firstname : user.Firstname,
+                      ImagePath : user.ImagePath,
+                      UserId : user.UserId,
+                      SignalrId: signalrId
                     }
-                    context.commit("manageOnlineUsers",onlineUser);
+                     context.commit("manageOnlineUsers",onlineUser);
+                   }
                 }
               }
               else if(diff >= 7200 && userId == context.state.user.UserId)
@@ -1004,7 +1010,7 @@ export default createStore({
     getEncryptionKey(context){
       axios.get(context.state.apiUrl+"random").then(
           response =>  {
-            context.commit("getEncryptionKey",JSON.parse(response.data.value));
+            context.commit("getEncryptionKey",response.data);
           }
       );
    },
@@ -1014,19 +1020,19 @@ export default createStore({
       response => {
         if (response.data) {
           context.commit("getCoverImage",response.data);
-          context.dispatch("setCoverImage",response.data);
+          context.dispatch("setCoverImage",{coverImage  : response.data});
         }
       }
       );
    },
    setCoverImage(context,payload){
-     axios.post(context.state.apiUrl+"coverImage/"+payload);
+     axios.post(context.state.apiUrl+"coverImage",payload);
    },
    getCoverImage(context,payload){
      axios.get(context.state.apiUrl+"coverImage").then(
        response => {
         if (response.data) {
-          context.commit("getCoverImage",response.data); 
+          context.commit("getCoverImage",response.data.coverImage);
         }
        }
      );

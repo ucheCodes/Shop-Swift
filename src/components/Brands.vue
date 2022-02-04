@@ -124,9 +124,9 @@ export default {
     width: 80px;
     height: 80px;
 }
-.brand-card .row{
+/* .brand-card .row{
     width: fit-content;
-}
+} */
     .brand-card .col-4{
         box-shadow: 0 0 20px 0px rgba(88, 64, 64, 0.3);
         width: 100%;

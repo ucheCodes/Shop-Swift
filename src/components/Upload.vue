@@ -44,11 +44,12 @@
                 </div>
                 <div class="flex-row">
                     <label for="description">Display Picture</label>
-                     <input @change="uploadBrandImg" class="input brandImg" type="file"/>
+                     <input @change="uploadBrandImg" accept=".jpg, .jpeg" class="input brandImg" type="file"/>
                 </div>
                 <div class="flex-row">
                     <label for="description">Preview</label>
-                     <img :src="photoUrl+brandImg" alt="preview">
+                    <img v-if="brandImg" :src="photoUrl+brandImg" alt="preview">
+                    <img v-else-if="coverImg" @click="activateInput" :src="photoUrl+coverImg" alt="cover-logo">
                 </div>
         </div>
         <div class="uploads" id="ads">
@@ -85,14 +86,17 @@
                 </div>
                 <div class="flex-row">
                     <label for="description">Upload Ad</label>
-                     <input @change="uploadAdFile" id="ad-file" class="input" type="file"/>
+                     <input @change="uploadAdFile" accept=".jpg, .jpeg, .mp4, .3gp" id="ad-file" class="input" type="file"/>
                 </div>
-                <div class="flex-row" v-if="adFile.includes('.jpg') || adFile.includes('.jpeg')">
+                <div class="flex-row" v-if="adFilename.includes('.jpg') || adFilename.includes('.jpeg')">
                     <label for="description">Preview</label>
                      <img :src="photoUrl+adFile" alt="preview">
                 </div>
-                <div v-else-if="adFile.includes('.mp4')">
-                     <video controls autoplay :src="photoUrl+adFile"></video>
+                <div v-else-if="adFilename.includes('.mp4')">
+                     <video controls autoplay :src="videoUrl+adFile"></video>
+                </div>
+                <div v-else>
+                    <img v-if="coverImg" @click="activateInput" :src="photoUrl+coverImg" alt="cover-logo">
                 </div>
         </div>
         <div class="uploads" id="product">
@@ -143,18 +147,19 @@
             </div>
             <div class="flex-row">
                 <label for="description">Preview</label>
-                <img :src="photoUrl+productImg" alt="preview">
+                <img v-if="productImg" :src="photoUrl+productImg" alt="preview">
+                 <img v-else-if="coverImg" @click="activateInput" :src="photoUrl+coverImg" alt="cover-logo">
             </div>
             <div class="flex-row">
-                <label for="file">Related Products</label>
-                <input @change="uploadRelatedProductImage" class="productImg2" type="file" multiple>
+                <label for="file">Add Similar Products</label>
+                <input @change="uploadRelatedProductImage" accept=".jpg, .jpeg" class="productImg2" type="file" multiple>
             </div>
         </div>
         <div id="story" class="uploads">
             <h3>Add to your daily story</h3>
             <div class="flex-row">
                 <label for="story">Add Story</label>
-                <input @change="uploadStoryFile" type="file">
+                <input accept=".jpg, .jpeg, .mp4, .3gp" @change="uploadStoryFile" type="file">
             </div>
             <div class="flex-row">
                 <label for="price">Description</label>
@@ -162,11 +167,14 @@
             </div>
             <div class="flex-row">
                 <label for="description">Preview</label>
-                <div v-if="storyFile.includes('.jpg') || storyFile.includes('.jpeg')">
+                <div v-if="storyFilename.includes('.jpg') || storyFilename.includes('.jpeg')">
                      <img :src="photoUrl+storyFile" alt="preview">
                 </div>
-                <div v-else-if="storyFile.includes('.mp4')">
-                     <video controls autoplay :src="photoUrl+storyFile"></video>
+                <div v-else-if="storyFilename.includes('.mp4')">
+                     <video controls autoplay :src="videoUrl+storyFile"></video>
+                </div>
+                <div v-else-if="coverImg">
+                     <img :src="photoUrl+coverImg" alt="preview">
                 </div>
             </div>
         </div>
@@ -174,11 +182,11 @@
             <h3>Change Display Pictures</h3>
             <div class="flex-row">
                 <label for="dp">Profile Picture</label>
-                <input  @change="changeDp($event)"  type="file">
+                <input accept=".jpg, .jpeg"  @change="changeDp($event)"  type="file">
             </div>
             <div class="flex-row">
                 <label for="dp2">Brand Picture</label>
-                <input @change="changeDp($event)" type="file">
+                <input accept=".jpg, .jpeg" @change="changeDp($event)" type="file">
             </div>
 
         </div>
@@ -228,18 +236,20 @@ export default {
     props:['productId'],
     data() {
         return {
-            brandImg:"cart3.jpg",
+            brandImg:"",
             category: '',
             categories:[],
             isUser:true,
-            productImg:"img.jpg",
-            adFile:"img.jpg",
-            storyFile:'img.jpg',
+            productImg:"",
+            adFile:"",
+            adFilename:"",
+            storyFile:'',
+            storyFilename:'',
             relatedProductImages:[]
         }
     },
     computed:{
-        ...mapState(["apiUrl","photoUrl","user","brand","allProducts","user"]),
+        ...mapState(["apiUrl","photoUrl","videoUrl","user","brand","allProducts","user", "coverImg"]),
     },
     created() {
         if (this.brand) {
@@ -259,14 +269,11 @@ export default {
             category.selectedIndex = 1;
             this.changeCategory('product');
             var product = this.allProducts.find(p => p.Id == this.productId);
-            //console.log(product);
                 document.querySelector(".productName").value = product.Name;
                 document.querySelector(".productShip").value = product.Shipping;
                 document.querySelector(".productPrice").value = product.Price;
                 document.querySelector(".productSearch").value = product.Search;
-                //document.querySelector(".productUnit").options[0].text = product.Unit;
                 document.querySelector("#productDesc").value = product.Description;
-                //document.querySelector(".productCat").options[0].text = product.Category;
                 this.productImg = product.ImagePath;
                 this.relatedProductImages = product.RelatedImages;
 
@@ -360,10 +367,9 @@ export default {
                         Date: new Date().toUTCString() 
                     }
                     this.postProduct(product);
-                    this.productImg = "img.jpg";
                     this.relatedProductImages = [];
                     productName.value = "";productDesc.value = ""; productSearch.value = "",
-                    productPrice.value = 0; productShip.value = 0;             
+                    productPrice.value = 0; productShip.value = 0;           
                    }
                     else{
                         alert("you dont have a brand account. Go to login menu and register Now.")
@@ -389,9 +395,9 @@ export default {
                         Category: ad_category.value,
                         Desc: ad_desc.value,
                         File: this.adFile,
+                        Filename : this.adFilename,
                         Date: new Date().toUTCString()
                  };
-                // console.log(ad);
                 this.postAds(ad);
                 }
             }
@@ -402,6 +408,7 @@ export default {
                     UserId : this.user.UserId,
                     Desc: story_desc.value,
                     File: this.storyFile,
+                    Filename : this.storyFilename,
                     Date: new Date().toUTCString()
                 }
                 this.postStory(story);
@@ -413,7 +420,7 @@ export default {
             axios.post(this.apiUrl+"default/savefile",formData)
                 .then(
                     response => {
-                        if (response.data != "img.jpg") {
+                        if (response.data) {
                             this.brandImg = response.data;
                         }
                     }
@@ -426,12 +433,11 @@ export default {
                 axios.post(this.apiUrl+"default/savefile",formData)
                     .then(
                         response => {
-                            if (response.data != "img.jpg" && (response.data.includes('.jpg') || (response.data.includes('.jpeg')))) {
+                            if (response.data) {
                                 this.productImg = response.data;
                             }
                             else{
                                 alert("file format not supported, only .jpg and jpeg files are acceptable");
-                                this.productImg = 'img.jpg';
                             }
                         }
                     )
@@ -448,12 +454,12 @@ export default {
                             response => {
                                 if (Array.isArray(response.data)) {
                                     response.data.forEach(image => {
-                                        if ((image.includes('.jpg') || (image.includes('.jpeg')))) {
+                                        if (image) {
                                             this.relatedProductImages.push(image);
                                         }
                                     });
                                 }
-                                else if(response.data != "img.jpg"){
+                                else{
                                    this.relatedProductImages.push(response.data); 
                                 }
                             }
@@ -463,22 +469,24 @@ export default {
         uploadAdFile(event){
                 let formData = new FormData();
                 formData.append('file',event.target.files[0]);
+                this.adFilename = event.target.files[0].name;
                 axios.post(this.apiUrl+"default/savefile",formData)
                     .then(
                         response => {
-                            if (response.data != "img.jpg") {
+                            if (response.data) {
                                 this.adFile = response.data;
                             }
                         }
-                    )
+                    );
         },
         uploadStoryFile(event){
                 let formData = new FormData();
                 formData.append('file',event.target.files[0]);
+                this.storyFilename = event.target.files[0].name;
                 axios.post(this.apiUrl+"default/savefile",formData)
                     .then(
                         response => {
-                            if (response.data != "img.jpg") {
+                            if (response) {
                                 this.storyFile = response.data;
                             }
                         }

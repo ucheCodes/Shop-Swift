@@ -149,7 +149,6 @@ export default {
              IsSuperAdmin : IsSuperAdmin,
              IsAdmin : IsAdmin,
              IsAffiliate : false,
-             ImagePath : "img.jpg",
              Date : new Date().toUTCString()
            };
           return true;

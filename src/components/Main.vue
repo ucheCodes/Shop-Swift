@@ -4,8 +4,9 @@
         <div class="sidebar">
             <div class="sidebar-user">
                 <div class="user-wrapper">  
-                <img @click="activateInput" :src="photoUrl+user.ImagePath" alt="user-logo">
-                <input @change="_changeDp" type="file" id="dp"> 
+                <img v-if="user.ImagePath" @click="activateInput" :src="photoUrl+user.ImagePath" alt="user-logo">
+                <img v-else-if="coverImg" @click="activateInput" :src="photoUrl+coverImg" alt="cover-logo">
+                <input @change="_changeDp" accept = ".jpg, .jpeg" type="file" id="dp"> 
                 <div>
                     <h4 class="username">{{user.Lastname + " "+user.Firstname}}</h4>
                     <small v-if="user.IsSuperAdmin">super admin</small>
@@ -106,7 +107,7 @@ export default {
       }
   },
   computed: {
-      ...mapState(["photoUrl","user","allProducts","allBrands"]),
+      ...mapState(["photoUrl","user","allProducts","allBrands","coverImg"]),
   },
   methods: {
       ...mapActions(["keyExists","changeDp","getUserByCookie","getAllUsers","getAllProducts","getAllBrands","getAds"]),
@@ -148,19 +149,6 @@ export default {
   created() {
   },
   mounted() {
-    //  var date = new Date().toUTCString();
-    //  var date2 = moment(date);
-    // // date2.format('YY-MM-DD');
-    // //     console.log(date2);
-
-    // var a = moment([1991,0,4]);
-    // var b = moment([2007,1,2]);
-    // var res = a.diff(date2,'years');
-    // console.log(res);
-
-    // var testArr = [10,20,300,40,300,300];
-    // testArr[testArr.map((x,i) => [i,x]).filter(item => item[1] == 300)[0][0]] = 30;
-    // console.log(testArr);
   },
 }
 </script>

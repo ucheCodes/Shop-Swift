@@ -94,7 +94,7 @@
                             <td>{{user.Mobile}}</td>
                             <td>{{user.Date}}</td>     
                             <td v-if="user.ImagePath != null"><img :src="photoUrl+user.ImagePath" alt="img"></td>  
-                            <td v-else><img :src="photoUrl+'img.jpg'" alt="img"></td>  
+                            <td v-else-if="coverImg" ><img :src="photoUrl+coverImg" alt="chat-img"></td>  
                             <td @click="goToChat(user.UserId)"><span class="fas fa-comment"></span></td> 
                           </tr>
                       </tbody>
@@ -120,6 +120,7 @@
                       <h4>{{notif.Lastname}} {{notif.Firstname}}</h4>
                       <div class="flex-row">
                             <div v-if="notif.ImagePath"><img :src="photoUrl+notif.ImagePath" alt="customer"></div>
+                            <div v-else-if="coverImg"><img :src="photoUrl+coverImg" alt="chat-img"></div>
                             <small class="mobile" :class="{showMobile : showMobile}">Mobile: {{notif.Mobile}}</small>
                             <div class="contact">
                               <span v-if="notif.NotificationType == 'like'"  @click="viewLikes(notif.ProductId)" class="fas fa-eye"></span>
@@ -145,6 +146,7 @@
                       <h4>{{notif.Lastname}} {{notif.Firstname}}</h4>
                       <div class="flex-row">
                             <div v-if="notif.ImagePath"><img :src="photoUrl+notif.ImagePath" alt="customer"></div>
+                            <div v-else-if="coverImg"><img :src="photoUrl+coverImg" alt="chat-img"></div>
                             <small class="mobile" :class="{showMobile : showMobile}">Mobile: {{notif.Mobile}}</small>
                             <div class="contact">
                               <span v-if="notif.NotificationType == 'like'"  @click="viewLikes(notif.ProductId)" class="fas fa-eye"></span>
@@ -220,7 +222,7 @@ export default {
       }
     },
     computed:{
-         ...mapState(["allUsers","allProducts","allBrands","photoUrl","apiUrl","modifiedBrands","notifications","user","showNotifier"])
+         ...mapState(["allUsers","allProducts","allBrands","coverImg","photoUrl","apiUrl","modifiedBrands","notifications","user","showNotifier"])
     },
     methods: {
       ...mapActions(["getAllUsers","getNotifications"]),

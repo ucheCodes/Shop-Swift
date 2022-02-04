@@ -1,8 +1,8 @@
 <template>
     <div>
         <div class="latest-products">
+            <h2 class="header-title">Latest Product Catalogues</h2>
             <div class="row" v-if="productCatalogue.length">
-                <h2 class="header-title">Latest Product Catalogues</h2>
                 <div class="col-4"  v-for="catalogue in productCatalogue" :key="catalogue.Id">
                     <div class="product">
                         <div class="catalogue-details">
@@ -37,13 +37,13 @@
                 <h3 class="header-title">Featured Contents that may interest and entertain you.</h3>
                 <div class="ad-products">
                    <div class="col-4"  v-for="ad in ads" :key="ad.Id">
-                        <div class="product">
+                        <div class="product" v-if="ad.Filename">
                             <b><label>{{ad.Brand}}</label></b>
-                            <div class="product-img" v-if="ad.File.includes('.jpg') || ad.File.includes('.jpeg')">
+                            <div class="product-img" v-if="ad.Filename.includes('.jpg') || ad.File.includes('.jpeg')">
                                 <img :src="photoUrl+ad.File" @click="viewAds(ad.Id)" alt="start">
                             </div>
-                            <div class="product-img" v-else-if="ad.File.includes('.mp4') || ad.File.includes('.3gp')">
-                                 <video @click="viewAds(ad.Id)" :src="photoUrl+ad.File"></video>
+                            <div class="product-img" v-else-if="ad.Filename.includes('.mp4') || ad.File.includes('.3gp')">
+                                 <video @click="viewAds(ad.Id)" :src="videoUrl+ad.File"></video>
                              </div>
                             <label>{{ad.Product}}</label>
                             <div>
@@ -104,7 +104,7 @@ export default {
         }
     },
     computed:{
-        ...mapState(["allProducts","photoUrl","apiUrl","allBrands","allAds"]),
+        ...mapState(["allProducts","photoUrl","videoUrl","apiUrl","allBrands","allAds"]),
     },
     methods: {
         //...mapActions(["getAllProducts"]),

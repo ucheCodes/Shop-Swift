@@ -6,7 +6,8 @@
                 <div class="col-1">
                     <div class="chat-top">
                         <span @click="createOrViewGroups" class="fas fa-ellipsis-v"></span>
-                        <img :src="photoUrl+user.ImagePath" alt="chat-img">
+                        <img v-if="user.ImagePath" :src="photoUrl+user.ImagePath" alt="chat-img">
+                        <img v-else-if="coverImg" :src="photoUrl+coverImg" alt="chat-img">
                         <span @click="viewGroups" class="fas fa-layer-group"></span>
                     </div>
                     <div class="chat-search">
@@ -21,7 +22,8 @@
                             <div v-if="onlineUsers.length">    
                                 <div v-for="u in onlineUsers" :key="u.signalrId" class="body" @click="chatUser(u.UserId)">
                                     <div class="chat-img">
-                                        <img :src="photoUrl+u.ImagePath" alt="chat-img">
+                                        <img v-if="u.ImagePath" :src="photoUrl+u.ImagePath" alt="chat-img">
+                                        <img v-else-if="coverImg" :src="photoUrl+coverImg" alt="chat-img">
                                     </div>
                                     <div class="chat-text">
                                         <label for="chat" class="names">{{u.Lastname}} {{u.Firstname}}</label>
@@ -39,13 +41,12 @@
                             <div v-if="lastChats.size> 0">
                                 <div v-for="[key,value] in lastChats" :key="key" class="body" @click="messageFromRecent(value.partnerId,value.chatId)">
                                     <div class="chat-img">
-                                        <img :src="photoUrl+value.imagePath" alt="chat-img">
+                                        <img  v-if="value.imagePath" :src="photoUrl+value.imagePath" alt="chat-img">
+                                        <img v-else-if="coverImg" :src="photoUrl+coverImg" alt="chat-img">
                                     </div>
                                     <div class="chat-text">
                                         <label class="names">{{value.lastname}} {{value.Firstname}}</label>
-                                        <label v-if="value.lastMessage.endsWith('.jpg') || value.lastMessage.endsWith('.jpeg') ||
-                                        value.lastMessage.endsWith('.mp4') || value.lastMessage.endsWith('.mp3') || 
-                                        value.lastMessage.endsWith('.3gp')">media file received</label>
+                                        <label v-if="value.lastMessage == 'media file sent to '+apiUrl">media file received</label>
                                         <label v-else-if="value.lastMessage.length > 25" for="text">{{value.lastMessage.substring(0,25)+" ..."}}</label>
                                         <label v-else for="text">{{value.lastMessage}}</label>
                                         <small>{{value.day}}</small>
@@ -66,7 +67,8 @@
                                 <h2 class="header-title">Available Groups</h2>
                                 <div v-for="[id,group] in groups" :key="id" class="body" @click="chatGroup(id,group.title,group.imagePath)">
                                     <div class="chat-img">
-                                        <img :src="photoUrl+group.imagePath" alt="chat-img">
+                                        <img v-if="group.imagePath" :src="photoUrl+group.imagePath" alt="chat-img">
+                                        <img v-else-if="coverImg" :src="photoUrl+coverImg" alt="chat-img">
                                     </div>
                                     <div class="chat-text">
                                         <label for="chat" class="names">{{group.title}}</label>
@@ -80,11 +82,12 @@
                                     <div v-for="[id,value] in activeGroups" :key="id">
                                         <div class="body" @click="chatGroup(value.chatId,value.title,value.imagePath)">
                                             <div class="chat-img">
-                                                <img :src="photoUrl+value.imagePath" alt="chat-img">
+                                                <img v-if="value.imagePath" :src="photoUrl+value.imagePath" alt="chat-img2">
+                                                <img v-else-if="coverImg" :src="photoUrl+coverImg" alt="chat-img">
                                             </div>
                                             <div @click="resetCount(value.chatId)" class="chat-text">
                                                 <label class="names">{{value.title}}</label>
-                                                <label v-if="value.body.endsWith('.jpg') || value.body.endsWith('.jpeg') ||  value.body.endsWith('.mp4') || value.body.endsWith('.mp3') || value.body.endsWith('.3gp')">media file received</label>
+                                                <label v-if="value.lastMessage == 'media file sent to '+apiUrl">media file received</label>
                                                 <label v-else-if="value.body.length > 25" for="text">{{value.body.substring(0,25)+" ..."}}</label>
                                                 <label v-else for="text">{{value.body}}</label>
                                                 <small>{{value.day}}</small>
@@ -114,7 +117,8 @@
                         <div class="chat-top">
                             <span @click="updateLastChat(user.UserId,chatId)" class="fas fa-chevron-left"></span>
                             <div class="receiver-detail">
-                                <img :src="photoUrl+allChats.get(chatId).receiverImagePath" alt="chat-img">
+                                <img v-if="allChats.get(chatId).receiverImagePath" :src="photoUrl+allChats.get(chatId).receiverImagePath" alt="chat-img">
+                                <img v-else-if="coverImg" :src="photoUrl+coverImg" alt="chat-img">
                                 <div class="info">
                                     <label class="name" v-if="allChats.get(chatId).receiverLastname.length < 7 && allChats.get(chatId).receiverFirstname.length < 7">
                                         {{allChats.get(chatId).receiverLastname}} {{allChats.get(chatId).receiverFirstname}}</label>
@@ -130,21 +134,18 @@
                             </div>
                         </div>
                         <div class="chat-body msg">
-                        <div class="msg-container">
+                        <div class="msg-container" id="scroller">
                             <div id="scroll-chat" class="messages" v-for="chat in allChats.get(chatId).chats" :key="chat.Id">
                                 <div class="sent" v-if="chat.sender == this.user.UserId">
                                     <small>{{chat.date}}</small><span @click="deleteChat(chat)" class="fas fa-trash"></span><br>
-                                    <span v-if="chat.body == 'img.jpg'">
-                                        <small>Server could not process the sent file, it might have been bigger than the max size</small>
+                                    <span v-if="chat.filename.includes('.jpg') || chat.filename.includes('.jpeg')">
+                                        <img :src="photoUrl+chat.file" alt="chatter">
                                     </span>
-                                    <span v-else-if="chat.body.includes('.jpg') || chat.body.includes('.jpeg')">
-                                        <img :src="photoUrl+chat.body" alt="">
+                                    <span v-else-if="chat.filename.includes('.mp4') || chat.filename.includes('.3gp')">
+                                        <video controls :src="videoUrl+chat.file"></video>
                                     </span>
-                                    <span v-else-if="chat.body.includes('.mp4') || chat.body.includes('.3gp')">
-                                        <video controls :src="photoUrl+chat.body"></video>
-                                    </span>
-                                    <span v-else-if="chat.body.includes('.mp3')">
-                                        <audio controls :src="photoUrl+chat.body"></audio>
+                                    <span v-else-if="chat.filename.includes('.mp3')">
+                                        <audio controls :src="audioUrl+chat.file"></audio>
                                     </span>
                                     <span v-else>
                                         {{chat.body}}
@@ -153,17 +154,14 @@
                                 <div class="received" v-else>
                                     <div>
                                     <small>{{chat.date}}</small><br>
-                                    <span v-if="chat.body == 'img.jpg'">
-                                        <small>A media file was sent, server could not process the sent file, it might have been bigger than the max size</small>
+                                    <span v-if="chat.filename.includes('.jpg') || chat.filename.includes('.jpeg')">
+                                        <img :src="photoUrl+chat.file" alt="">
                                     </span>
-                                    <span v-if="chat.body.includes('.jpg') || chat.body.includes('.jpeg')">
-                                        <img :src="photoUrl+chat.body" alt="">
+                                    <span v-else-if="chat.filename.includes('.mp4') || chat.filename.includes('.3gp')">
+                                        <video controls :src="videoUrl+chat.file"></video>
                                     </span>
-                                    <span v-else-if="chat.body.includes('.mp4') || chat.body.includes('.3gp')">
-                                        <video controls :src="photoUrl+chat.body"></video>
-                                    </span>
-                                    <span v-else-if="chat.body.includes('.mp3')">
-                                        <audio controls :src="photoUrl+chat.body"></audio>
+                                    <span v-else-if="chat.filename.includes('.mp3')">
+                                        <audio controls :src="audioUrl+chat.file"></audio>
                                     </span>
                                     <span v-else>
                                         {{chat.body}}
@@ -175,20 +173,21 @@
                         </div>
                         <div class="msg-send">
                             <div class="send-container chat-bottom">
-                                <span @click="triggerChatFile" class="fas fa-image"><input @change="uploadChatFile" id="chatFile" type="file"></span>
+                                <span @click="triggerChatFile" class="fas fa-image"><input @change="uploadChatFile" accept=".jpg, .jpeg, .mp3, .3gp, .mp4" id="chatFile" type="file"></span>
                                 <textarea class="txtsend" placeholder="Type a message"></textarea>
                                 <span @click="sendMessage" class="fas fa-paper-plane"></span>
                             </div>
                         </div>
                 </div>
             </div>
-            <div class="row chatLayer2 groupChat" v-else-if="allGroupChats.size > 0 && showGroups == true" :class="{active : !isActive}">
+            <div class="row chatLayer2 groupChat" v-else-if="showGroups == true" :class="{active : !isActive}">
                 <div class="col-1" v-if="groupId">
                        <div class="chat-top">
                             <span @click="backFromGroups" class="fas fa-chevron-left"></span>
                             <div class="receiver-detail">
-                                <input @change="changeGroupDp" type="file" id="groupDp">
-                                <img @click="triggerChangeGroupDp" :src="photoUrl+groupImg" alt="chat-img">
+                                <input @change="changeGroupDp" accept=".jpg, .jpeg" type="file" id="groupDp">
+                                <img v-if="groupImg" @click="triggerChangeGroupDp" :src="photoUrl+groupImg" alt="chat-img">
+                                <img v-else-if="coverImg" @click="triggerChangeGroupDp" :src="photoUrl+coverImg" alt="chat-img">
                                 <div class="info" @click="callOneInput">
                                     <label class="name small" v-if="groupTitle.length < 15">{{groupTitle}}</label>
                                     <label class="name small" v-else>{{groupTitle.substring(0,12)}} ...</label>
@@ -211,24 +210,24 @@
                                 <div class="sent" v-if="chat.sender == user.UserId">
                                    <div class="groups">
                                        <div>
-                                        <span><img class="group-img" :src="photoUrl+chat.imagePath" alt="group"></span>
+                                        <span>
+                                            <img v-if="chat.imagePath" class="group-img" :src="photoUrl+chat.imagePath" alt="group">
+                                            <img v-else-if="coverImg" class="group-img" :src="photoUrl+coverImg" alt="chat-img">
+                                        </span>
                                         <span>{{chat.lastname}} {{chat.firstname}}</span>
                                         <div>
                                             <small>{{chat.day}}</small><span @click="deleteGroupChat(chat)" class="fas fa-trash"></span>
                                         </div>
                                         </div>
                                         <div>
-                                           <span v-if="chat.body == 'img.jpg'">
-                                             <small>A media file was sent, server could not process the sent file, it might have been bigger than the max size</small>
-                                           </span>
-                                            <span v-else-if="chat.body.includes('.jpg') || chat.body.includes('.jpeg')">
-                                                <img :src="photoUrl+chat.body" alt="">
+                                            <span v-if="chat.filename && chat.filename.includes('.jpg') || chat.filename && chat.filename.includes('.jpeg')">
+                                                <img :src="photoUrl+chat.file" alt="">
                                             </span>
-                                             <span v-else-if="chat.body.includes('.mp4') || chat.body.includes('.3gp')">
-                                                 <video controls :src="photoUrl+chat.body"></video>
+                                             <span v-else-if="chat.filename && chat.filename.includes('.mp4') || chat.filename && chat.filename.includes('.3gp')">
+                                                 <video controls :src="videoUrl+chat.file"></video>
                                             </span>
-                                             <span v-else-if="chat.body.includes('.mp3')">
-                                                <audio controls :src="photoUrl+chat.body"></audio>
+                                             <span v-else-if="chat.filename && chat.filename.includes('.mp3')">
+                                                <audio controls :src="audioUrl+chat.file"></audio>
                                              </span>
                                             <span v-else>
                                                 {{chat.body}}
@@ -240,22 +239,22 @@
                                 <div v-else class="received">
                                    <div class="groups">
                                        <div>
-                                         <span><img class="group-img" :src="photoUrl+chat.imagePath" alt="group"></span>
+                                         <span>
+                                         <img v-if="chat.imagePath" class="group-img" :src="photoUrl+chat.imagePath" alt="group">
+                                         <img v-else-if="coverImg" class="group-img" :src="photoUrl+coverImg" alt="chat-img">
+                                         </span>
                                          <span>{{chat.lastname}} {{chat.firstname}}</span>
                                          <small>{{chat.day}}</small>
                                         </div>
                                         <div>
-                                            <span v-if="chat.body == 'img.jpg'">
-                                                <small>A media file was sent, server could not process the sent file, it might have been bigger than the max size</small>
+                                            <span v-if="chat.filename && chat.filename.includes('.jpg') || chat.filename && chat.filename.includes('.jpeg')">
+                                                <img :src="photoUrl+chat.file" alt="">
                                             </span>
-                                            <span v-else-if="chat.body.includes('.jpg') || chat.body.includes('.jpeg')">
-                                                <img :src="photoUrl+chat.body" alt="">
+                                             <span v-else-if="chat.filename && chat.filename.includes('.mp4') || chat.filename && chat.filename.includes('.3gp')">
+                                                 <video controls :src="videoUrl+chat.file"></video>
                                             </span>
-                                             <span v-else-if="chat.body.includes('.mp4') || chat.body.includes('.3gp')">
-                                                 <video controls :src="photoUrl+chat.body"></video>
-                                            </span>
-                                             <span v-else-if="chat.body.includes('.mp3')">
-                                                <audio controls :src="photoUrl+chat.body"></audio>
+                                             <span v-else-if="chat.filename && chat.filename.includes('.mp3')">
+                                                <audio controls :src="photoUrl+chat.file"></audio>
                                              </span>
                                             <span v-else>
                                                 {{chat.body}}
@@ -268,10 +267,13 @@
                         </div>
                         <div class="msg-send" v-if="isGroupMember">
                             <div class="send-container chat-bottom">
-                                <span @click="triggerGroupChatFile" class="fas fa-image"><input @change="uploadGroupChatFile" id="groupChatFile" type="file"></span>
+                                <span @click="triggerGroupChatFile" class="fas fa-image"><input accept=".jpg, .jpeg, .mp3, .3gp, .mp4" @change="uploadGroupChatFile" id="groupChatFile" type="file"></span>
                                 <textarea id="txtsend" class="txtsend" placeholder="Type a message"></textarea>
                                 <span @click="sendGroupMessage" class="fas fa-paper-plane"></span>
                             </div>
+                        </div>
+                        <div v-else>
+                            <small>Click + icon above to join this group now</small>
                         </div>
                     </div>
 
@@ -295,11 +297,11 @@
                         <div class="col-2" v-if="storyContent.length">
                             <div class="myslides fade"  v-for="(s,count) in storyContent" :key="s.Id" :id="s.File">
                                 <div class="numbertext">{{count}}/{{storyContent.length}}</div>
-                                <div v-if="s.File.includes('.jpg') || s.File.includes('.jpeg')">
+                                <div v-if="s.Filename.includes('.jpg') || s.Filename.includes('.jpeg')">
                                     <img :src="photoUrl+s.File" :alt="s.Id"/>
                                 </div>
-                                <div v-else-if="s.File.includes('.mp4') || s.File.includes('.3gp')">
-                                    <video controls :src="photoUrl+s.File"></video>
+                                <div v-else-if="s.Filename.includes('.mp4') || s.Filename.includes('.3gp')">
+                                    <video controls :src="videoUrl+s.File"></video>
                                 </div>
                                 <div>
                                     <p>{{s.Desc}}</p>
@@ -307,17 +309,16 @@
                             </div>
                         </div>
                         <div v-else>
-                            <img :src="photoUrl+user.ImagePath" alt="slide1">
-                            <!-- <div v-if="fetchStory">
-                                <p>fetching data ... </p>
-                            </div> -->
+                            <img v-if="user.ImagePath" :src="photoUrl+user.ImagePath" alt="slide1">
+                            <img v-else-if="coverImg" class="group-img" :src="photoUrl+coverImg" alt="chat-img">
                         </div>
                     </div>
                 </div>
                 <div class="col-2">
                     <div class="status-container flex-col">
                         <div class="flex-row">
-                            <img class="status-img" :src="photoUrl+user.ImagePath" alt="status">
+                            <img v-if="user.ImagePath" class="status-img" :src="photoUrl+user.ImagePath" alt="status">
+                            <img v-else-if="coverImg" class="status-img" :src="photoUrl+coverImg" alt="chat-img">
                             <div class="flex-col">
                                 <label>View or Add Story</label>
                                 <router-link to="/uploads">Click here to add story</router-link>
@@ -327,7 +328,8 @@
                             <h4 class="header-title">Most Recent Updates</h4>
                             <div class="story" v-for="s in story" :key="s.Id">
                                 <div class="flex-row" @click="getUserStory(s.UserId)">
-                                    <img class="status-img" :src="photoUrl+s.ImagePath" alt="status">
+                                    <img v-if="s.ImagePath" class="status-img" :src="photoUrl+s.ImagePath" alt="status">
+                                    <img v-else-if="coverImg" class="status-img" :src="photoUrl+coverImg" alt="chat-img">
                                     <div class="flex-col">
                                         <label>{{s.Lastname}}  {{s.Firstname}}</label>
                                         <small>{{s.day}} {{s.time}}</small>
@@ -392,7 +394,7 @@ export default {
             chatId: '',
             groupId: '',
             groupTitle : '',
-            groupImg : 'img.jpg',
+            groupImg : '',
             toggleGroups : '',
             groupAdminId : '',
             isGroupMember : false,
@@ -407,7 +409,7 @@ export default {
         }
     },
     computed:{
-        ...mapState(['user',"allUsers","apiUrl","onlineUsers","photoUrl","allChats","lastChats","signalrId","groups","allGroupChats","activeGroups","activeGroups"])
+        ...mapState(["coverImg",'user',"allUsers","videoUrl","apiUrl","audioUrl","onlineUsers","photoUrl","allChats","lastChats","signalrId","groups","allGroupChats","activeGroups","activeGroups"])
     },
     methods: {
         ...mapMutations(["addChat","resetGroupCount"]),
@@ -440,9 +442,9 @@ export default {
         },
         chatUser(id){
             this.viewChats(id);
-            // var scroll = document.getElementById("scroll-chat");//scroll-group
-            // scroll.scrollIntoView();//scroll.scrollHeight;
-            // console.log(scroll)
+            if (document.getElementById("scroller")) {
+                document.getElementById("scroller").scrollTo(0,document.getElementById("scroller").scrollHeight+5);
+            }
         },
         chatGroup(groupId,groupTitle,groupImg){
             this.groupId = groupId;
@@ -456,13 +458,13 @@ export default {
             axios.post(this.apiUrl+"random/"+JSON.stringify(isMemberIds)).then(
                 response => {
                     if (response.data) {
-                      this.isGroupMember = response.data;  
+                      this.isGroupMember = response.data; 
                     }
                 }
             );
-            // var scroll = document.getElementById("scrollGroup");//scroll-group
-            // scroll.scrollTop = scroll.scrollHeight;
-            // console.log(scroll)
+            if(document.getElementById("scrollGroup")){
+                document.getElementById("scrollGroup").scrollTo(0,document.getElementById("scrollGroup").scrollHeight+5);
+            }
         },
         viewChats(receiverId){//review this code as I will use it to reach chat outside here
             if (receiverId != '') {
@@ -586,7 +588,6 @@ export default {
                     AdminId : this.user.UserId,
                     Title : inputText.value,
                     Date : new Date().toUTCString(),
-                    ImagePath : 'img.jpg'
                 };
                 axios.post(this.apiUrl+"groups",newGroup).then(
                     response => {
@@ -613,12 +614,16 @@ export default {
                 Receiver: this.receiver,
                 ChatId : this.chatId,
                 Body : text.value,
+                Filename : "",
                 SenderSignalrId : this.signalrId,
                 Date : new Date().toUTCString()
             };
-            this.postChat(chat);
             text.value = "";
+                if(document.getElementById("scroller")){
+                    document.getElementById("scroller").scrollTo(0,document.getElementById("scroller").scrollHeight+15);
+                }
             }
+            this.postChat(chat);
         },
         sendGroupMessage(){
            var text = document.getElementById('txtsend');
@@ -632,11 +637,12 @@ export default {
                 SenderSignalrId : this.signalrId,
                 Date : new Date().toUTCString()
             };
-            this.postGroupChat(chat);
             text.value = "";
-            // var scroller = document.getElementById("scrollGroup");//work on scroller to delete scroll messages
-            // scroller.scrollTop = scroller.scrollHeight;
+            if (document.getElementById("scrollGroup")) {
+                document.getElementById("scrollGroup").scrollTo(0,document.getElementById("scrollGroup").scrollHeight+5);
             }
+            }
+            this.postGroupChat(chat);
         },
         deleteChat(chat){
             if (confirm("this chat will be permanently deleted from both end")) {
@@ -648,27 +654,31 @@ export default {
                connection.client.invoke("DeleteGroupChat",chat.chatId,chat.id);
             }
         },
-        postToChat(file){
+        postToChat(file,ext){
             if (confirm("confirm media post to receivers end")) {
                 var chat = {
                     Sender : this.user.UserId,
                     Receiver: this.receiver,
                     ChatId : this.chatId,
-                    Body : file,
+                    File : file,
+                    Filename : ext,
+                    Body : "media file sent to "+this.apiUrl,
                     SenderSignalrId : this.signalrId,
                     Date : new Date().toUTCString()
             };
             this.postChat(chat);
             }
         },
-        postToGroupChat(file){
+        postToGroupChat(file,ext){
             if (confirm("confirm media post to all connected members")) {
                 var chat = {
                     Id : '',
                     Sender : this.user.UserId,
                     Receiver: this.groupId,
                     ChatId : this.groupId,
-                    Body : file,
+                    File : file,
+                    Filename : ext,
+                    Body : "media file sent to "+this.apiUrl,
                     SenderSignalrId : this.signalrId,
                     Date : new Date().toUTCString()
                 };
@@ -685,7 +695,7 @@ export default {
             axios.post(this.apiUrl+"default/savefile",formData)
             .then(
                 response => {
-                    this.postToChat(response.data)
+                    this.postToChat(response.data,event.target.files[0].name);
                 }
             );
         },
@@ -699,7 +709,7 @@ export default {
             axios.post(this.apiUrl+"default/savefile",formData)
             .then(
                 response => {
-                    this.postToGroupChat(response.data)
+                    this.postToGroupChat(response.data,event.target.files[0].name)
                 }
             );
         },
@@ -748,7 +758,7 @@ export default {
             axios.post(this.apiUrl+"default/savefile",formData)
             .then(
                 response => {
-                    if (response.data != 'img.jpg' && response.data != '') {
+                    if (response.data) {
                         var group = this.groups.get(this.groupId);
                         if (group != "") {
                             var newGroup = {
@@ -822,6 +832,9 @@ export default {
 </script>
 
 <style scoped>
+    #scroller{
+        scroll-behavior: smooth;
+    }
     .myslides.show{
         display: block;
         max-height: 500px;
@@ -1256,12 +1269,12 @@ export default {
         .sent video, .received video,
         .sent .groups video, .received .groups video
         {
-             width: 200px !important;
-             height: 200px !important;
+             width: 150px !important;
+             height: 150px !important;
         }
         .sent audio, .received audio{
-             width: 200px;
-             height: 40px;
+             width: 150px;
+             height: 30px;
         }
                  .sent{
              float: right;
