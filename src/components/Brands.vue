@@ -8,7 +8,8 @@
                     <div class="brand-info">
                         <div class="flex-row">
                             <div class="flex-col info">
-                                <img :id="brand.UserId" @click="goToProducts" class="img-rounded" :src="photoUrl+brand.userImg" :alt="brand.Id">
+                                <img v-if="brand.UserImg" :id="brand.UserId" @click="goToProducts" class="img-rounded" :src="photoUrl+brand.userImg" :alt="brand.Id">
+                                <img v-else-if="coverImg" :id="brand.UserId" @click="goToProducts" class="img-rounded" :src="photoUrl+coverImg" alt="brand-img">
                                 <button @click="followBrand" :id="brand.UserId" class="btn">Follow</button>
                             </div>
                             <div class="flex-col info">

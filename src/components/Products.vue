@@ -167,7 +167,7 @@
     </div>
 
         <div v-if="story.length">
-            <h2 class="header-title">Story</h2>
+            <!-- <h2 class="header-title">Story</h2> -->
             <div class="row">
                 <div class="col-2">
                     <div class="myslides fade"  v-for="(s,count) in story" :key="s.Id"  :id="s.UserId">

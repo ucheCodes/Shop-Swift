@@ -139,7 +139,7 @@
             </div>
             <div class="flex-row">
                 <label for="price">Description</label>
-                <textarea  class="textarea" id="productDesc" maxlength="80" placeholder="Type a description of the product"></textarea>
+                <textarea  class="textarea" id="productDesc"  placeholder="Type a description of the product"></textarea>
             </div>
             <div class="flex-row">
                 <label for="file">Product Image</label>

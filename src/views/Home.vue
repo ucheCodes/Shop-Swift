@@ -63,7 +63,8 @@
             <div class="testimony small-container mg-5">
               <div class="row">
                 <div class="col-4" v-for="(feedback) in feedbacks" :key="feedback.Id">
-                    <img :src="photoUrl+feedback.ImagePath" :alt="feedback.ImagePath"/>
+                    <img v-if="feedback.ImagePath" :src="photoUrl+feedback.ImagePath" :alt="feedback"/>
+                    <img v-else-if="coverImg" :src="photoUrl+coverImg" alt="chat-img">
                     <h3 class="name">{{feedback.Lastname}} {{feedback.Firstname}}</h3>
                     <p :id="'p'+feedback.Id">{{feedback.Feedback}}</p>
                     <button :id="feedback.Id" value="Read" text="read" @click="showFeedbacks" class="btn fas fa-arrow-up">Read</button>
@@ -84,7 +85,7 @@
          </div>
          <div class="feedback-msg row">
            <div class="msg">
-              <textarea name="feedback" class="feedback-txt" maxlength="80" placeholder="Leave us a comment or reply"></textarea>
+              <textarea name="feedback" class="feedback-txt" placeholder="Leave us a comment or reply"></textarea>
               <div class="rating-star">
                 <label for="">Rate Us:</label>
                 <select name="categoy" id="stars">
@@ -99,6 +100,10 @@
            </div>
            <button @click="hideFeedback()" class="feedback-display">Click Here to leave a comment</button>
          </div>
+
+        <!-- <div v-if="showNotifier">
+            <notifier :message="notifyData"/>
+        </div>       -->
   </div>
 </template>
 
@@ -106,18 +111,21 @@
 import {mapActions, mapMutations, mapState} from 'vuex'
 import axios from 'axios'
 import {themes} from '../assets/themes'
+// import Notifier from '@/components/Notifier.vue'
 
 export default {
   name: 'Home',
+  // component:{Notifier},
   data() {
     return {
       superAdmin: this.$store.state.user.IsSuperAdmin,
       feedbacks:[],
-      colors : []
+      colors : [],
+      notifyData: {},
     }
   },
   computed:{
-    ...mapState(["user","photoUrl","apiUrl","allUsers","coverImg"])
+      ...mapState(["user","photoUrl","apiUrl","allUsers","coverImg", "showNotifier"])
   },
   methods: {
     ...mapActions(["changeCoverImage"]),
@@ -159,7 +167,7 @@ export default {
           axios.post(this.apiUrl+"feedback",feedback)
           .then(
               response => {
-                alert(response.data);
+                alert("success");
                 textVal.value  = "";
               feedback = {
                     Id : response.data,
@@ -176,7 +184,14 @@ export default {
           )
         }
       }
-      else{alert("your feedback is not received, you must sign up first.")}
+      else{
+        this.notifyData = {
+          info : "warn",
+          msg : "welcome to shop swift, we appreciate your presence here. kindly sign up for a better user experience. "
+        }
+        //this.setNotifier();
+        alert("register first")
+      }
     },
     deleteFeedback(event){
           axios.delete(this.apiUrl+"feedback/"+event.target.id)

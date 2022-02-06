@@ -13,13 +13,14 @@ function updateLocalStorage(cart) {
 export default createStore({
   state: {
     cart : [],
-    // serverPath: "https:/localhost:5001/",
-    // apiUrl : "https://localhost:5001/api/",
     photoUrl : "data:image/jpeg;base64,",
     videoUrl : "data:video/mp4;base64,",
     audioUrl : "data:audio/wav;base64,",
-    serverPath: "https://swift-shop.azurewebsites.net/",
-    apiUrl : "https://swift-shop.azurewebsites.net/api/",
+   serverPath: "https://swift-shop.azurewebsites.net/",
+   apiUrl : "https://swift-shop.azurewebsites.net/api/",
+
+    // apiUrl : "https://localhost:5001/api/",
+    // serverPath : "https://localhost:5001/",
     allUsers:[],
     allProducts:[],
     allBrands:[],
@@ -66,13 +67,14 @@ export default createStore({
     },
     logUser(state,payload){
       if (payload.msg != "failed") {
-        if (confirm("Would you like to remain signed in automatically???")) {
-          state.user = payload.data;
-          localStorage.setItem('userId',JSON.stringify(state.user.UserId))
-        }
-        else{
-         state.user = payload.data;
-        }
+        // if (confirm("Would you like to remain signed in automatically???")) {
+        //   state.user = payload.data;
+        //   localStorage.setItem('userId',JSON.stringify(state.user.UserId))
+        // }
+        // else{
+        //  state.user = payload.data;
+        // }
+        state.user = payload.data;
         state.isLogged = true;
         alert("Welcome "+state.user.Lastname);
         connection.client.invoke("AddUserToGroups",state.user.UserId);
@@ -470,54 +472,61 @@ export default createStore({
     var timeDiff = "";
     payload[1].forEach(element => {
       timeDiff = "";
-    var notif = JSON.parse(element.value);
-    var a = moment(new Date().toUTCString());
-    var b = moment(notif.Date);
-    var years = a.diff(b,'years');
-    var months = a.diff(b,'months');
-    var weeks = a.diff(b,'weeks');
-    var days = a.diff(b,'days');
-    var hours = a.diff(b,'hours');
-    var minutes = a.diff(b,'minutes');
-    var seconds = a.diff(b,'seconds');
-    if (years > 0) {
-      timeDiff = years+" years ago";
+    if (element.value) {
+      var notif = JSON.parse(element.value);
+      var a = moment(new Date().toUTCString());
+      var b = moment(notif.Date);
+      var years = a.diff(b,'years');
+      var months = a.diff(b,'months');
+      var weeks = a.diff(b,'weeks');
+      var days = a.diff(b,'days');
+      var hours = a.diff(b,'hours');
+      var minutes = a.diff(b,'minutes');
+      var seconds = a.diff(b,'seconds');
+      if (years > 0) {
+        timeDiff = years+" years ago";
+      }
+      else if (months > 0) {
+        timeDiff = months+" months ago";
+      }
+      else if (months > 0) {
+        timeDiff = months+" months ago";
+      }
+      else if (weeks > 0) {
+        timeDiff = weeks+" weeks ago";
+      }
+      else if (days > 0) {
+        timeDiff = days+" weeks ago";
+      }
+      else if (hours > 0) {
+        timeDiff = hours+" hours ago";
+      }
+      else if (minutes > 0) {
+        timeDiff = minutes+" minutes ago";
+      }
+      else { timeDiff = seconds+" seconds ago";};
+      var user = state.allUsers.find(u => u.UserId == notif.SenderId);
+      if (user) {
+        var userData = {
+          Lastname : user.Lastname,
+          Firstname : user.Firstname,
+          ImagePath : user.ImagePath,
+          Mobile : user.Mobile,
+          TimeDiff : timeDiff,
+        };
+        Object.assign(notif,userData);
+        notifArr.push(notif);
+      }
     }
-    else if (months > 0) {
-      timeDiff = months+" months ago";
-    }
-    else if (months > 0) {
-      timeDiff = months+" months ago";
-    }
-    else if (weeks > 0) {
-      timeDiff = weeks+" weeks ago";
-    }
-    else if (days > 0) {
-      timeDiff = days+" weeks ago";
-    }
-    else if (hours > 0) {
-      timeDiff = hours+" hours ago";
-    }
-    else if (minutes > 0) {
-      timeDiff = minutes+" minutes ago";
-    }
-    else { timeDiff = seconds+" seconds ago";};
-    var user = state.allUsers.find(u => u.UserId == notif.SenderId);
-    if (user) {
-      var userData = {
-        Lastname : user.Lastname,
-        Firstname : user.Firstname,
-        ImagePath : user.ImagePath,
-        Mobile : user.Mobile,
-        TimeDiff : timeDiff,
-      };
-      Object.assign(notif,userData);
-      notifArr.push(notif);
-    }
+    else{
+      console.log("this is why get notifications throws error");
+      console.log(element);
+    }  
     });
-    notifArr.sort((c1,c2) => moment(c2.Date) - moment(c1.Date));
-    state.notifications.set(payload[0],notifArr);
+     notifArr.sort((c1,c2) => moment(c2.Date) - moment(c1.Date));
+     state.notifications.set(payload[0],notifArr);
   },
+
   newNotification(state,payload){
     var timeDiff = "just now";
     var user = state.allUsers.find(u => u.UserId == payload.senderId);
@@ -581,9 +590,9 @@ export default createStore({
       var userData = context.state.allUsers.find(user => (user.Email == payload.id || user.Mobile == payload.id) && Decryption(user.Password1) == Decryption(payload.password));
       if (userData) {
         if (context.state.user.UserId != "") {
-          if (confirm("Would you like to overwrite the signed in account and keep this account signed in?")) {
+          if (confirm("Would you like to overwrite the signed in account?")) {
             context.commit("getAndLogUser",userData);
-            localStorage.setItem('userId',JSON.stringify(userData.UserId))
+            //localStorage.setItem('userId',JSON.stringify(userData.UserId))
           }
           else{
             context.commit("getAndLogUser",userData);

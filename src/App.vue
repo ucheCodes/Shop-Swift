@@ -83,7 +83,7 @@ export default {
       this.getGroupChats();
       this.getEncryptionKey();
       this.getCoverImage();
-      this.getUserByCookie();
+     // this.getUserByCookie();
 
 
     setInterval(function() {
